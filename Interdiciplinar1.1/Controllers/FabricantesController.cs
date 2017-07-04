@@ -10,102 +10,95 @@ using System.Web.Mvc;
 
 namespace Interdiciplinar1._1.Controllers
 {
-    public class CategoriasController : Controller
+    public class FabricantesController : Controller
     {
         private EFContext context = new EFContext();
-        // GET: Categorias
+        // GET: Fabricantes
         public ActionResult Index()
         {
-            return View(context.Categorias.OrderBy(c=> c.Nome));
+            return View(context.Fabricantes.OrderBy(f => f.Nome));
         }
 
-        // GET: Categorias/Details/5
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Fabricante fabricante)
+        {
+            context.Fabricantes.Add(fabricante);
+            context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Edit(long? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Fabricante fabricante = context.Fabricantes.Find(id);
+            if(fabricante == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(fabricante);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Fabricante fabricante)
+        {
+            if (ModelState.IsValid)
+            {
+                context.Entry(fabricante).State = EntityState.Modified;
+                context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(fabricante);
+        }
+
         public ActionResult Details(long? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Categoria categoria = context.Categorias.Find(id);
-            if (categoria == null)
+            Fabricante fabricante = context.Fabricantes.Find(id);
+            if (fabricante == null)
             {
                 return HttpNotFound();
             }
 
-            return View(categoria);
+            return View(fabricante);
         }
 
-        // GET: Categorias/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Categorias/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(Categoria categoria)
-        {
-            context.Categorias.Add(categoria);
-            context.SaveChanges();
-            return RedirectToAction("Index");
-
-        }
-
-        // GET: Categorias/Edit/5
-        public ActionResult Edit(long? id)
-        {
-
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Categoria categoria = context.Categorias.Find(id);
-            if (categoria == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(categoria);
-        }
-
-        // POST: Categorias/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(Categoria categoria)
-        {
-            if (ModelState.IsValid)
-            {
-                context.Entry(categoria).State = EntityState.Modified;
-                context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(categoria);
-
-        }
-
-        // GET: Categorias/Delete/5
         public ActionResult Delete(long? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Categoria categoria = context.Categorias.Find(id);
-            if (categoria == null)
+            Fabricante fabricante = context.Fabricantes.Find(id);
+            if (fabricante == null)
             {
                 return HttpNotFound();
             }
 
-            return View(categoria);
+            return View(fabricante);
         }
 
-        // POST: Categorias/Delete/5
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Delete(long id)
         {
-            Categoria categoria = context.Categorias.Find(id);
-            context.Categorias.Remove(categoria);
+            Fabricante fabricante = context.Fabricantes.Find(id);
+            context.Fabricantes.Remove(fabricante);
             context.SaveChanges();
             return RedirectToAction("Index");
         }

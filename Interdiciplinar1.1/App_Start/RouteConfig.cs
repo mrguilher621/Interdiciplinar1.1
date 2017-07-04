@@ -16,7 +16,7 @@ namespace Interdiciplinar1._1
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Categorias", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "Fabricantes", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

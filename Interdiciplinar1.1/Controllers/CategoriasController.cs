@@ -1,9 +1,14 @@
 ﻿
+using Interdiciplinar1._1.Models;
 using Models.Tabelas;
+using Newtonsoft.Json;
 using Servico.Tabelas;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Interdiciplinar1._1.Controllers
@@ -13,18 +18,57 @@ namespace Interdiciplinar1._1.Controllers
         #region [Metodos]
         private CategoriaServico categoriaServico = new CategoriaServico();
 
-        private ActionResult GetViewCategoriaId(long? id)
+        private async Task<ActionResult> GetViewCategoriaId(long? id)
         {
             if (id == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Categoria categoria = categoriaServico.GetCategoriaId((long)id);
-            if (categoria == null)
+
+            CategoriaAPIModel item = null;
+            var resp = await GetFromAPI(response =>
             {
-                return HttpNotFound();
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = response.Content
+                    .ReadAsStringAsync().Result;
+                    item = JsonConvert
+                    .DeserializeObject<CategoriaAPIModel>(result);
+                }
+            }, id.Value);
+
+            if (!resp.IsSuccessStatusCode)
+                return new HttpStatusCodeResult(resp.StatusCode);
+
+            if (item.Message == "!OK" ||
+                item.Result == null) return HttpNotFound();
+
+            return View(item.Result);
+        }
+
+        private async Task<HttpResponseMessage> GetFromAPI(
+           Action<HttpResponseMessage> action,
+           long? id = null)
+        {
+            using (var client = new HttpClient())
+            {
+                var reqUrl = HttpContext.Request.Url;
+                var baseUrl = string.Format("{0}://{1}",
+                    reqUrl.Scheme, reqUrl.Authority);
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Clear();
+
+                var url = "Api/Categorias";
+                if (id != null) url += "/" + id;
+
+                var request = await client.GetAsync(url);
+                //HttpContent content = new HttpContent();
+                ////content.
+                //var r = client.PostAsync(url, content);
+
+                if (action != null)
+                    action.Invoke(request);
+
+                return request;
             }
-            return View(categoria);
         }
 
         private void PopularViewBag(Categoria categoria = null)
@@ -60,17 +104,31 @@ namespace Interdiciplinar1._1.Controllers
 
         #endregion [Metodos]
         // GET: Categorias
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(categoriaServico.GetNomeCategoria());
+            var apiModel = new CategoriaListAPIModel();
+
+            var resp = await GetFromAPI(response =>
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    // { Message: "OK", Result: [{},{}]}
+                    string result = response.Content
+                    .ReadAsStringAsync().Result;
+                    apiModel = JsonConvert
+                    .DeserializeObject<CategoriaListAPIModel>(result);
+                }
+            });
+
+            return View(apiModel.Result);
         }
 
         // GET: Categorias/Details/5
-        public ActionResult Details(long? id)
+        public async Task<ActionResult> Details(long? id)
         {
            
 
-            return GetViewCategoriaId(id);
+            return await GetViewCategoriaId(id);
         }
 
         // GET: Categorias/Create
@@ -91,12 +149,12 @@ namespace Interdiciplinar1._1.Controllers
         }
 
         // GET: Categorias/Edit/5
-        public ActionResult Edit(long? id)
+        public async Task<ActionResult> Edit(long? id)
         {
 
             PopularViewBag(categoriaServico.GetCategoriaId((long)id));
 
-            return GetViewCategoriaId(id);
+            return await GetViewCategoriaId(id);
         }
 
         // POST: Categorias/Edit/5
@@ -110,9 +168,9 @@ namespace Interdiciplinar1._1.Controllers
         }
 
         // GET: Categorias/Delete/5
-        public ActionResult Delete(long? id)
+        public async  Task<ActionResult> Delete(long? id)
         {
-            return GetViewCategoriaId(id);
+            return await GetViewCategoriaId(id);
         }
 
         // POST: Categorias/Delete/5

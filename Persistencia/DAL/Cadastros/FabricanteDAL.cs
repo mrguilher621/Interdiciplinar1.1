@@ -13,6 +13,11 @@ namespace Persistencia.DAL.Cadastros
     {
         private EFContext context = new EFContext();
 
+        public IQueryable<Fabricante> GetFabricante()
+        {
+            return context.Fabricantes;
+        }
+
         public IQueryable<Fabricante> GetNomeFabricante()
         {
             return context.Fabricantes.OrderBy(b => b.Nome);

@@ -13,6 +13,11 @@ namespace Persistencia.DAL.Tabelas
     {
         private EFContext context = new EFContext();
 
+        public IQueryable<Categoria> GetCategoria()
+        {
+            return context.Categorias;
+        }
+
         public IQueryable<Categoria> GetNameCategoria()
         {
             return context.Categorias.OrderBy(b => b.Nome);

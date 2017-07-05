@@ -12,6 +12,11 @@ namespace Servico.Cadastros
     {
         private ModeloDAL modeloDAL = new ModeloDAL();
 
+        public IQueryable<Modelo> GetModelo()
+        {
+            return modeloDAL.GetModelo();
+        }
+
         public IQueryable GetNomeModelo()
         {
             return modeloDAL.GetNomeModelo();
@@ -30,6 +35,16 @@ namespace Servico.Cadastros
         public Modelo EliminarModeloId(long id)
         {
             return modeloDAL.EliminarModeloId(id);
+        }
+
+        public IEnumerable<Modelo>GetByCategoria(long categoriaId)
+        {
+            return modeloDAL.GetByCategoria(categoriaId);
+        }
+
+        public IEnumerable<Modelo> GetByFabricante(long fabricanteId)
+        {
+            return modeloDAL.GetByFabricante(fabricanteId);
         }
     }
 }

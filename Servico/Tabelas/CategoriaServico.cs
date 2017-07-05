@@ -12,6 +12,11 @@ namespace Servico.Tabelas
     {
         private CategoriaDAL categoriaDAL = new CategoriaDAL();
 
+        public IQueryable<Categoria> GetCategoria()
+        {
+            return categoriaDAL.GetCategoria();
+        }
+
         public IQueryable<Categoria> GetNomeCategoria()
         {
             return categoriaDAL.GetNameCategoria();

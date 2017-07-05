@@ -12,6 +12,11 @@ namespace Servico.Cadastros
     {
         private FabricanteDAL fabricanteDAL = new FabricanteDAL();
 
+        public IQueryable<Fabricante> GetFabricante()
+        {
+            return fabricanteDAL.GetFabricante();
+        }
+
         public IQueryable<Fabricante> GetNomeFabricante()
         {
             return fabricanteDAL.GetNomeFabricante();

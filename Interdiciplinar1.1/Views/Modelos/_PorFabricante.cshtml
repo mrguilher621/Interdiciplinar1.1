@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Interdiciplinar1._1.Models.Modelo>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Relação	de Modelos registrados para	o fabricante
+    </div>
+    <div class="panel-body">
+        <table class="table	table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ModeloId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Nome)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Preco)
+                    </th>
+                    <th>Categoria</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ModeloId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Nome)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Preco)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Categoria.Nome)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>				
+    <div class="panel-footer panel-info">
+
+    </div>
+</div>

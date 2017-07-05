@@ -9,5 +9,6 @@ namespace Interdiciplinar1._1.Models
     {
         public long FabricanteId { get; set; }
         public string Nome { get; set; }
+        public virtual ICollection<Modelo> Modelo { get; set; }
     }
 }

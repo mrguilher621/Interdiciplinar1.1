@@ -9,10 +9,15 @@ namespace Interdiciplinar1._1.Contexts
 {
     public class EFContext : DbContext
     {
-        public EFContext() : base("Banco"){ }
+        public EFContext() : base("Banco")
+        {
+            Database.SetInitializer<EFContext>(new DropCreateDatabaseIfModelChanges<EFContext>());
+        }
 
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Fabricante> Fabricantes { get; set; }
+
+        public DbSet<Modelo> Modelos { get; set; }
 
     }
 }

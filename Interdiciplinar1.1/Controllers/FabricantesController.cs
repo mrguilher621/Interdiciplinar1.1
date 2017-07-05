@@ -68,7 +68,8 @@ namespace Interdiciplinar1._1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Fabricante fabricante = context.Fabricantes.Find(id);
+            Fabricante fabricante = context.Fabricantes.Where(f=>f.FabricanteId == id).
+                Include(m=>m.Modelo).First();
             if (fabricante == null)
             {
                 return HttpNotFound();

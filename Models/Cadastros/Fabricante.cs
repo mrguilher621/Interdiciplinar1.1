@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Interdiciplinar1._1.Models
+namespace Models.Cadastros
 {
-    public class Categoria
+    public class Fabricante
     {
-        public long CategoriaId { get; set; }
+        public long? FabricanteId { get; set; }
         public string Nome { get; set; }
-
         public virtual ICollection<Modelo> Modelo { get; set; }
     }
 }

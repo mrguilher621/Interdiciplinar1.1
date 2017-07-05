@@ -1,46 +1,83 @@
-﻿using Interdiciplinar1._1.Contexts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using Models.Cadastros;
+using Servico.Cadastros;
+using Servico.Tabelas;
 using System.Data.Entity;
-using Interdiciplinar1._1.Models;
+using System.Linq;
 using System.Net;
+using System.Web.Mvc;
 
 namespace Interdiciplinar1._1.Controllers
 {
     public class ModelosController : Controller
     {
-        private EFContext context = new EFContext();
-        // GET: Modelos
-        public ActionResult Index()
-        {
-            var modelos = context.Modelos.Include(c => c.Categoria).Include(f => f.Fabricante).OrderBy(n => n.Nome);
-            return View(modelos);
-        }
+        #region [Metodos]
+        private ModeloServico modeloServico = new ModeloServico();
+        private CategoriaServico categoriaServico = new CategoriaServico();
+        private FabricanteServico fabricanteServico = new FabricanteServico();
 
-        // GET: Modelos/Details/5
-        public ActionResult Details(long? id)
+        private ActionResult GetViewModeloId(long? id)
         {
-            if (id == null)
+            if(id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Modelo modelo = context.Modelos.Where(m=>m.ModeloId == id).
-                Include(c=>c.Categoria).Include(f=>f.Fabricante).First();
-            if (modelo == null)
+            Modelo modelo = modeloServico.GetModeloId((long)id);
+            if(modelo == null)
             {
                 return HttpNotFound();
             }
             return View(modelo);
         }
 
+        private void PopularViewBag(Modelo modelo = null)
+        {
+            if(modelo == null)
+            {
+                ViewBag.CategoriaId = new SelectList(categoriaServico.GetNomeCategoria(), "CategoriaId", "Nome");
+                ViewBag.FabricanteId = new SelectList(fabricanteServico.GetNomeFabricante(), "FabricanteId", "Nome");
+            }
+            else
+            {
+                ViewBag.CategoriaId = new SelectList(categoriaServico.GetNomeCategoria(), "CategoriaId", "Nome",modelo.CategoriaId);
+                ViewBag.FabricanteId = new SelectList(fabricanteServico.GetNomeFabricante(), "FabricanteId", "Nome",modelo.FabricanteId);
+            }
+        }
+
+        private ActionResult GravarModelo(Modelo modelo)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    modeloServico.GravarModelo(modelo);
+                    return RedirectToAction("Index");
+                }
+                return View(modelo);
+            }
+            catch
+            {
+                return View(modelo);
+            }
+        }
+        #endregion [Metodos]
+
+        // GET: Modelos
+        public ActionResult Index()
+        {
+            
+            return View(modeloServico.GetNomeModelo());
+        }
+
+        // GET: Modelos/Details/5
+        public ActionResult Details(long? id)
+        {
+            return GetViewModeloId(id);
+        }
+
         // GET: Modelos/Create
         public ActionResult Create()
         {
-            ViewBag.CategoriaId = new SelectList(context.Categorias.OrderBy(b => b.Nome), "CategoriaId", "Nome");
-            ViewBag.FabricanteId = new SelectList(context.Fabricantes.OrderBy(b => b.Nome), "FabricanteId", "Nome");
+            PopularViewBag();
             return View();
         }
 
@@ -48,70 +85,27 @@ namespace Interdiciplinar1._1.Controllers
         [HttpPost]
         public ActionResult Create(Modelo  modelo)
         {
-            try
-            {
-                context.Modelos.Add(modelo);
-                context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View(modelo);
-            }
+            return GravarModelo(modelo);
         }
 
         // GET: Modelos/Edit/5
         public ActionResult Edit(long? id)
         {
-            if(id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Modelo modelo = context.Modelos.Find(id);
-            if(modelo == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.CategoriaId = new SelectList(context.Categorias.OrderBy(b => b.Nome), "CategoriaId", "Nome",modelo.CategoriaId);
-            ViewBag.FabricanteId = new SelectList(context.Fabricantes.OrderBy(b => b.Nome), "FabricanteId", "Nome",modelo.FabricanteId);
-            return View(modelo);
+            PopularViewBag(modeloServico.GetModeloId((long)id));
+            return GetViewModeloId(id);
         }
 
         // POST: Modelos/Edit/5
         [HttpPost]
         public ActionResult Edit(Modelo modelo)
         {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    context.Entry(modelo).State = EntityState.Modified;
-                    context.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-
-                return View(modelo);
-            }
-            catch
-            {
-                return View(modelo);
-            }
+            return GravarModelo(modelo);
         }
 
         // GET: Modelos/Delete/5
         public ActionResult Delete(long? id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Modelo modelo = context.Modelos.Where(m => m.ModeloId == id).
-                Include(c => c.Categoria).Include(f => f.Fabricante).First();
-            if (modelo == null)
-            {
-                return HttpNotFound();
-            }
-            return View(modelo);
+            return GetViewModeloId(id);
         }
 
         // POST: Modelos/Delete/5
@@ -120,9 +114,7 @@ namespace Interdiciplinar1._1.Controllers
         {
             try
             {
-                Modelo modelo = context.Modelos.Find(id);
-                context.Modelos.Remove(modelo);
-                context.SaveChanges();
+                Modelo modelo = modeloServico.EliminarModeloId(id);
                 TempData["Message"] = "Modelo" + modelo.Nome.ToUpper() + "Foi Removido";
                 return RedirectToAction("Index");
             }

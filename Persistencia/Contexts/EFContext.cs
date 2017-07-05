@@ -1,14 +1,17 @@
-﻿using Interdiciplinar1._1.Models;
-using System;
-using System.Collections.Generic;
+﻿using Models.Cadastros;
+using Models.Tabelas;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
-namespace Interdiciplinar1._1.Contexts
+namespace Persistencia.Contexts
 {
     public class EFContext : DbContext
     {
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        }
         public EFContext() : base("Banco")
         {
             Database.SetInitializer<EFContext>(new DropCreateDatabaseIfModelChanges<EFContext>());

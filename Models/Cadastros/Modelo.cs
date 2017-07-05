@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Models.Tabelas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Interdiciplinar1._1.Models
+namespace Models.Cadastros
 {
     public class Modelo
     {

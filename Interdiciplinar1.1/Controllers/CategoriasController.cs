@@ -1,43 +1,82 @@
-﻿using Interdiciplinar1._1.Contexts;
-using Interdiciplinar1._1.Models;
-using System;
-using System.Collections.Generic;
+﻿
+using Models.Tabelas;
+using Servico.Tabelas;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Interdiciplinar1._1.Controllers
 {
     public class CategoriasController : Controller
     {
-        private EFContext context = new EFContext();
-        // GET: Categorias
-        public ActionResult Index()
-        {
-            return View(context.Categorias.OrderBy(c=> c.Nome));
-        }
+        #region [Metodos]
+        private CategoriaServico categoriaServico = new CategoriaServico();
 
-        // GET: Categorias/Details/5
-        public ActionResult Details(long? id)
+        private ActionResult GetViewCategoriaId(long? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Categoria categoria = context.Categorias.Find(id);
+            Categoria categoria = categoriaServico.GetCategoriaId((long)id);
             if (categoria == null)
             {
                 return HttpNotFound();
             }
-
             return View(categoria);
+        }
+
+        private void PopularViewBag(Categoria categoria = null)
+        {
+            if (categoria == null)
+            {
+                ViewBag.CategoriaId = new SelectList(categoriaServico.GetNomeCategoria(), "CategoriaId", "Nome");
+               
+            }
+            else
+            {
+                ViewBag.CategoriaId = new SelectList(categoriaServico.GetNomeCategoria(), "CategoriaId", "Nome", categoria.CategoriaId);
+                
+            }
+        }
+
+        private ActionResult GravarCategoria(Categoria categoria)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    categoriaServico.GravarCategoria(categoria);
+                    return RedirectToAction("Index");
+                }
+                return View(categoria);
+            }
+            catch
+            {
+                return View(categoria);
+            }
+        }
+
+        #endregion [Metodos]
+        // GET: Categorias
+        public ActionResult Index()
+        {
+            return View(categoriaServico.GetNomeCategoria());
+        }
+
+        // GET: Categorias/Details/5
+        public ActionResult Details(long? id)
+        {
+           
+
+            return GetViewCategoriaId(id);
         }
 
         // GET: Categorias/Create
         public ActionResult Create()
         {
+            PopularViewBag();
             return View();
         }
 
@@ -46,9 +85,8 @@ namespace Interdiciplinar1._1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(Categoria categoria)
         {
-            context.Categorias.Add(categoria);
-            context.SaveChanges();
-            return RedirectToAction("Index");
+            
+            return GravarCategoria(categoria);
 
         }
 
@@ -56,17 +94,9 @@ namespace Interdiciplinar1._1.Controllers
         public ActionResult Edit(long? id)
         {
 
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Categoria categoria = context.Categorias.Find(id);
-            if (categoria == null)
-            {
-                return HttpNotFound();
-            }
+            PopularViewBag(categoriaServico.GetCategoriaId((long)id));
 
-            return View(categoria);
+            return GetViewCategoriaId(id);
         }
 
         // POST: Categorias/Edit/5
@@ -74,39 +104,22 @@ namespace Interdiciplinar1._1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Categoria categoria)
         {
-            if (ModelState.IsValid)
-            {
-                context.Entry(categoria).State = EntityState.Modified;
-                context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(categoria);
+           
+            return GravarCategoria(categoria);
 
         }
 
         // GET: Categorias/Delete/5
         public ActionResult Delete(long? id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Categoria categoria = context.Categorias.Find(id);
-            if (categoria == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View(categoria);
+            return GetViewCategoriaId(id);
         }
 
         // POST: Categorias/Delete/5
         [HttpPost]
         public ActionResult Delete(long id)
         {
-            Categoria categoria = context.Categorias.Find(id);
-            context.Categorias.Remove(categoria);
-            context.SaveChanges();
+            Categoria categoria = categoriaServico.EliminarCategoriaId(id);
             TempData["Message"] = "Categoria" + categoria.Nome.ToUpper() + "Foi Removido";
             return RedirectToAction("Index");
         }

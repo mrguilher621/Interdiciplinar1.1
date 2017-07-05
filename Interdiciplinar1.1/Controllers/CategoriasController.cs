@@ -107,6 +107,7 @@ namespace Interdiciplinar1._1.Controllers
             Categoria categoria = context.Categorias.Find(id);
             context.Categorias.Remove(categoria);
             context.SaveChanges();
+            TempData["Message"] = "Categoria" + categoria.Nome.ToUpper() + "Foi Removido";
             return RedirectToAction("Index");
         }
     }

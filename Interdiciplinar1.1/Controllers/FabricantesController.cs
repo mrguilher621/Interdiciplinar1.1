@@ -100,6 +100,7 @@ namespace Interdiciplinar1._1.Controllers
             Fabricante fabricante = context.Fabricantes.Find(id);
             context.Fabricantes.Remove(fabricante);
             context.SaveChanges();
+            TempData["Message"] = "Fabricante" + fabricante.Nome.ToUpper() + "Foi Removido";
             return RedirectToAction("Index");
         }
     }
